@@ -54,9 +54,15 @@ struct AdvancedGestaltEditorView: View {
                 }
             }
             .sheet(item: $editingKey) { item in
-                ValueEditorView(title: item.key, value: item.isCacheExtra ? model.cacheValue(forKey: item.key) : model.value(forKey: item.key), allowsDelete: item.isCacheExtra) { value in
-                    update(value: value, key: item.key, cache: item.isCacheExtra)
-                } onDelete: item.isCacheExtra ? { deleteCache(item.key) } : nil
+                ValueEditorView(
+                    title: item.key,
+                    value: item.isCacheExtra ? model.cacheValue(forKey: item.key) : model.value(forKey: item.key),
+                    allowsDelete: item.isCacheExtra,
+                    onSave: { value in
+                        update(value: value, key: item.key, cache: item.isCacheExtra)
+                    },
+                    onDelete: item.isCacheExtra ? { deleteCache(item.key) } : nil
+                )
             }
             .sheet(isPresented: $showingAdd) {
                 AddCacheExtraFieldView { key, value in
