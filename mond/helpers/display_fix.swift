@@ -39,17 +39,31 @@ struct CanvasPlistStore {
     static func ensureAccess() -> Bool {
         if accessGranted { return true }
 
-        // Request access to the exact plist first. Some iOS builds reject a
-        // directory extension for managed preferences but accept a file one.
+        // Request both the file and its parent directory. The sandbox can hide
+        // a system path before an extension is consumed, so fileExists() is
+        // deliberately never used as a prerequisite here.
         let paths = TweakPaths.canvasPlistCandidates + TweakPaths.canvasPlistCandidates.map {
             URL(fileURLWithPath: $0).deletingLastPathComponent().path
         }
         for path in Array(Set(paths)) {
-            guard FileManager.default.fileExists(atPath: path),
-                  let token = sandbox_extension_issue_file(path: path),
-                  (sandbox_extension_consume(token) ?? -1) >= 0 else { continue }
-            accessGranted = true
-            return true
+            if let token = sandbox_extension_issue_file(path: path),
+               (sandbox_extension_consume(token) ?? -1) >= 0 {
+                accessGranted = true
+                return true
+            }
+        }
+
+        // On builds where the app cannot issue a direct system-file extension,
+        // reuse the already-granted bad_query container extension. This is only
+        // an access grant; the actual plist is still written atomically below.
+        for plistPath in TweakPaths.canvasPlistCandidates {
+            let directory = URL(fileURLWithPath: plistPath).deletingLastPathComponent().path
+            var pathCString = directory.utf8CString.map { Int8($0) }
+            let handle = bad_query_file(&pathCString, true, nil, false, "com.apple.iokit.IOMobileGraphicsFamily.plist")
+            if handle >= 0 {
+                accessGranted = true
+                return true
+            }
         }
         return false
     }
@@ -59,6 +73,16 @@ struct CanvasPlistStore {
         return TweakPaths.canvasPlistCandidates
             .map { URL(fileURLWithPath: $0) }
             .first { FileManager.default.fileExists(atPath: $0.path) }
+    }
+
+    static var writableURL: URL? {
+        if let existingURL { return existingURL }
+        // iOS 27 devices commonly use the managed-preferences path. Return it
+        // after access is granted so a missing pre-existing plist can be created.
+        guard ensureAccess() else { return nil }
+        return TweakPaths.canvasPlistCandidates
+            .map { URL(fileURLWithPath: $0) }
+            .first { $0.path.contains("Managed Preferences/mobile") }
     }
 
     static func read() throws -> (URL, NSMutableDictionary) {
@@ -73,7 +97,21 @@ struct CanvasPlistStore {
         }
     }
 
+    static func readOrCreate() throws -> (URL, NSMutableDictionary) {
+        if let existingURL {
+            return try read()
+        }
+        guard let url = writableURL else {
+            throw CanvasPlistError.fileNotFound
+        }
+        return (url, NSMutableDictionary())
+    }
+
     static func write(_ dict: NSMutableDictionary, to url: URL) throws {
+        let parent = url.deletingLastPathComponent()
+        if !FileManager.default.fileExists(atPath: parent.path) {
+            throw CanvasPlistError.directoryNotFound
+        }
         let data = try PropertyListSerialization.data(fromPropertyList: dict, format: .xml, options: 0)
         let tempURL = url.deletingLastPathComponent()
             .appendingPathComponent(".\(url.lastPathComponent).\(UUID().uuidString).tmp")
@@ -99,8 +137,10 @@ struct CanvasPlistStore {
     }
 
     static func apply(_ profile: DisplayCanvasProfile) throws {
-        let (url, dict) = try read()
-        try ensureBackup(for: url)
+        let (url, dict) = try readOrCreate()
+        if FileManager.default.fileExists(atPath: url.path) {
+            try ensureBackup(for: url)
+        }
         dict["canvas_width"] = profile.width
         dict["canvas_height"] = profile.height
         try write(dict, to: url)
@@ -131,6 +171,7 @@ struct CanvasPlistStore {
 
 enum CanvasPlistError: LocalizedError {
     case fileNotFound
+    case directoryNotFound
     case invalidPlist
     case backupNotFound
 
@@ -138,6 +179,8 @@ enum CanvasPlistError: LocalizedError {
         switch self {
         case .fileNotFound:
             return "IOMobileGraphicsFamily.plist was not found or is not accessible."
+        case .directoryNotFound:
+            return "The managed preferences directory is not available on this iOS build."
         case .invalidPlist:
             return "IOMobileGraphicsFamily.plist is not a valid property list."
         case .backupNotFound:

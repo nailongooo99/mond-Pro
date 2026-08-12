@@ -51,16 +51,16 @@ struct ContentView: View {
                 if !mg_valid || mg_empty {
                     Section {
                         if mg_empty {
-                            PlainAlert(title: "Do not reboot!", icon: "exclamationmark.triangle.fill", text: "Your MobileGestalt.plist seems to be empty.", color: Color.yellow)
+                            PlainAlert(title: "请勿重启！", icon: "exclamationmark.triangle.fill", text: "MobileGestalt.plist 似乎为空。", color: Color.yellow)
                         }
                         
                         if !mg_valid {
-                            PlainAlert(title: "Do not reboot!", icon: "exclamationmark.triangle.fill", text: "Your MobileGestalt.plist seems to be invalid.", color: Color.yellow)
+                            PlainAlert(title: "请勿重启！", icon: "exclamationmark.triangle.fill", text: "MobileGestalt.plist 似乎无效。", color: Color.yellow)
                         }
                     } header: {
-                        Label("Warning", systemImage: "exclamationmark.triangle")
+                        Label("警告", systemImage: "exclamationmark.triangle")
                     } footer: {
-                        Text("Rebooting now might cause a bootloop. Try pressing 'Revert Tweaks'. If the warnings dont go away after that, you're fucked.")
+                        Text("现在重启可能导致设备陷入启动循环。请先点击“恢复修改”；如果警告仍未消失，请不要重启设备，并查看日志。")
                     }
                 }
                 
@@ -68,23 +68,23 @@ struct ContentView: View {
                     Button {
                         mg_apply()
                     } label: {
-                        Text("Apply Tweaks")
+                        Text("应用修改")
                     }
                     
                     Button {
                         mg_revert()
                     } label: {
-                        Text("Revert Tweaks")
+                        Text("恢复修改")
                     }
                 } footer: {
-                    Text("**WARNING:** These tweaks have the capability to break features on your device or softbrick it if misused!")
+                    Text("**警告：** 这些修改可能影响设备功能；使用不当还可能导致设备无法正常启动！")
                 }
                 
                 Section {
                     Picker(selection: $subtype) {
-                        Text("Original (\(og_subtype))").tag(og_subtype)
+                        Text("原始设置（\(og_subtype)）").tag(og_subtype)
                         if is_device_good() {
-                            Text("Disable Dynamic Island").tag(2436)
+                            Text("关闭灵动岛").tag(2436)
                         }
                         Text("iPhone 14 Pro").tag(2556)
                         Text("iPhone 14 Pro Max").tag(2796)
@@ -97,23 +97,23 @@ struct ContentView: View {
                             Text("iPhone Air").tag(2736)
                         }
                         if hasHomeButton() {
-                            Text("iPhone X Gestures").tag(2436)
+                            Text("iPhone X 手势").tag(2436)
                         }
                     } label: {
                         HStack {
-                            Text("Subtype")
+                            Text("设备子类型")
                             Spacer()
                         }
                     }
                     
-                    Toggle("Custom Device Name", isOn: $enable_devicename)
+                    Toggle("自定义设备名称", isOn: $enable_devicename)
                     
                     if enable_devicename {
-                        TextField("Device Name", text: $mg_devicename)
+                        TextField("设备名称", text: $mg_devicename)
                     }
 
                     if DisplayCanvasProfile.forSubtype(subtype) != nil {
-                        Toggle("Dynamic Island Status Bar / Canvas Fix", isOn: $enable_canvas_fix)
+                        Toggle("灵动岛状态栏 / 画布修复", isOn: $enable_canvas_fix)
                             .onChange(of: enable_canvas_fix) { _, enabled in
                                 if !enabled {
                                     try? CanvasPlistStore.revert()
@@ -123,68 +123,68 @@ struct ContentView: View {
                         if enable_canvas_fix {
                             let profile = DisplayCanvasProfile.forSubtype(subtype)!
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Target canvas: \(profile.width) × \(profile.height)")
+                                Text("目标画布：\(profile.width) × \(profile.height)")
                                     .font(.subheadline)
-                                Text("Writes canvas_width/canvas_height to IOMobileGraphicsFamily.plist. This is separate from MobileGestalt artwork and may require a reboot.")
+                                Text("将 canvas_width / canvas_height 写入 IOMobileGraphicsFamily.plist。它独立于 MobileGestalt 外观设置，可能需要重启后生效。")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
                         }
                         if let canvas_size {
-                            Text("Current canvas: \(canvas_size)")
+                            Text("当前画布：\(canvas_size)")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
                     }
                 } header: {
-                    Label("Device Artwork", systemImage: "paintbrush.pointed")
+                    Label("设备外观", systemImage: "paintbrush.pointed")
                 }
                 
                 // basic tweak toggles
                 Section {
-                    PlainToggle(text: "Dynamic Island", minSupportedVersion: 19.0, isOn: mg_key_binding(["YlEtTtHlNesRBMal1CqRaA"]))
-                    PlainToggle(text: "Always On Display", minSupportedVersion: 18.0, isOn: mg_key_binding(["j8/Omm6s1lsmTDFsXjsBfA", "2OOJf1VhaM7NxfRok3HbWQ"]))
-                    PlainToggle(text: "AOD Vibrancy", minSupportedVersion: 18.0, isOn: mg_key_binding(["ykpu7qyhqFweVMKtxNylWA"]))
-                    PlainToggle(text: "Charge Limit", minSupportedVersion: 17.0, isOn: mg_key_binding(["37NVydb//GP/GrhuTN+exg"]))
-                    PlainToggle(text: "Boot Chime", isOn: mg_key_binding(["QHxt+hGLaBPbQJbXiUJX3w"]))
-                    PlainToggle(text: "Liquid Glass LPM", minSupportedVersion: 19.0, isOn: mg_key_binding(["SAGvsp6O6kAQ4fEfDJpC4Q"]))
+                    PlainToggle(text: "灵动岛", minSupportedVersion: 19.0, isOn: mg_key_binding(["YlEtTtHlNesRBMal1CqRaA"]))
+                    PlainToggle(text: "全天候显示",  minSupportedVersion: 18.0, isOn: mg_key_binding(["j8/Omm6s1lsmTDFsXjsBfA", "2OOJf1VhaM7NxfRok3HbWQ"]))
+                    PlainToggle(text: "全天候显示鲜艳度", minSupportedVersion: 18.0, isOn: mg_key_binding(["ykpu7qyhqFweVMKtxNylWA"]))
+                    PlainToggle(text: "充电上限", minSupportedVersion: 17.0, isOn: mg_key_binding(["37NVydb//GP/GrhuTN+exg"]))
+                    PlainToggle(text: "开机提示音", isOn: mg_key_binding(["QHxt+hGLaBPbQJbXiUJX3w"]))
+                    PlainToggle(text: "Liquid Glass 低电量模式", minSupportedVersion: 19.0, isOn: mg_key_binding(["SAGvsp6O6kAQ4fEfDJpC4Q"]))
                 } header: {
-                    Label("Software-Oriented Features", systemImage: "gearshape")
+                    Label("软件功能", systemImage: "gearshape")
                 }
                 
                 Section {
-                    PlainToggle(text: "Camera Control", minSupportedVersion: 18.0, isOn: mg_key_binding(["CwvKxM2cEogD3p+HYgaW0Q", "oOV1jhJbdV3AddkcCg0AEA"]))
-                    PlainToggle(text: "Action Button", minSupportedVersion: 17.0, isOn: mg_key_binding(["cT44WE1EohiwRzhsZ8xEsw"]))
-                    PlainToggle(text: "Crash Detection", isOn: mg_key_binding(["HCzWusHQwZDea6nNhaKndw"]))
+                    PlainToggle(text: "相机控制", minSupportedVersion: 18.0, isOn: mg_key_binding(["CwvKxM2cEogD3p+HYgaW0Q", "oOV1jhJbdV3AddkcCg0AEA"]))
+                    PlainToggle(text: "操作按钮", minSupportedVersion: 17.0, isOn: mg_key_binding(["cT44WE1EohiwRzhsZ8xEsw"]))
+                    PlainToggle(text: "车祸检测", isOn: mg_key_binding(["HCzWusHQwZDea6nNhaKndw"]))
                     if hasHomeButton() {
-                        PlainToggle(text: "Enable Tap to Wake", isOn: mg_key_binding(["yZf3GTRMGTuwSV/lD7Cagw"]))
+                        PlainToggle(text: "轻点唤醒", isOn: mg_key_binding(["yZf3GTRMGTuwSV/lD7Cagw"]))
                     }
-                    PlainToggle(text: "Pulse Width Modulation", minSupportedVersion: 19.0, isOn: mg_key_binding(["6IejgN+1Fmu5/QrZFOIeNw"]))
+                    PlainToggle(text: "PWM 调光", minSupportedVersion: 19.0, isOn: mg_key_binding(["6IejgN+1Fmu5/QrZFOIeNw"]))
                 } header: {
-                    Label("Hardware-Oriented Features", systemImage: "iphone")
+                    Label("硬件功能", systemImage: "iphone")
                 }
                 
                 Section {
-                    PlainToggle(text: "Security Research Device UI", minSupportedVersion: 26.0, isOn: mg_key_binding(["XYlJKKkj2hztRP1NWWnhlw"]))
+                    PlainToggle(text: "安全研究设备界面", minSupportedVersion: 26.0, isOn: mg_key_binding(["XYlJKKkj2hztRP1NWWnhlw"]))
                     
                     PlainToggle(
-                        text: "Disable Region Restrictions",
+                        text: "解除地区限制",
                         infoType: .info,
-                        infoMessage: "This tweak may be broken or have no effect on some iOS versions or devices.",
+                        infoMessage: "此修改在部分 iOS 版本或设备上可能无效。",
                         isOn: mg_region_restrict_binding()
                     )
                     
                     PlainToggle(
                         text: "Apple Intelligence",
                         infoType: .info,
-                        infoMessage: "Apple Intelligence activation is currently broken and may not work.",
+                        infoMessage: "Apple Intelligence 目前可能无法正常启用。",
                         minSupportedVersion: 18.1,
                         isOn: mg_key_binding(["A62OafQ85EJAiiqKn4agtg"])
                     )
                     
                     HStack(spacing: 10) {
-                        Picker("Spoofing", selection: $product_type) {
-                            Text("Default").tag(machine_name())
+                        Picker("设备伪装", selection: $product_type) {
+                            Text("默认").tag(machine_name())
                             if UIDevice.current.userInterfaceIdiom == .pad {
                                 if doubleSystemVersion() >= 17.4 {
                                     Text("iPad Pro 11-inch (M4)").tag("iPad16,3")
@@ -212,8 +212,8 @@ struct ContentView: View {
                         
                         Button {
                             Alertinator.shared.alert(
-                                title: "Device Spoofing Info",
-                                body: "Only spoof your device model if you want to download Apple Intelligence. This may break Face ID. If you decide to unspoof and want to keep Apple Intelligence, do NOT re-enter the Apple Intelligence & Siri menu in Settings."
+                                title: "设备伪装说明",
+                                body: "只有在需要下载 Apple Intelligence 时才建议伪装设备型号。此操作可能影响 Face ID。如果取消伪装后仍想保留 Apple Intelligence，请不要再次进入“设置”中的“Apple Intelligence 与 Siri”页面。"
                             )
                         } label: {
                             Image(systemName: "info.circle")
@@ -222,35 +222,35 @@ struct ContentView: View {
                         .buttonStyle(.plain)
                     }
                 } header: {
-                    Label("Eligibility", systemImage: "checklist")
+                    Label("资格与兼容性", systemImage: "checklist")
                 }
                 
                 Section {
                     let cache_extra = mg_dict_now["CacheExtra"] as? NSMutableDictionary
                     
-                    PlainToggle(text: "Allow Installing iPadOS Apps", isOn: mg_key_binding(["9MZ5AdH43csAUajl/dU+IQ"], type: [Int].self, default_val: [1], on_val: [1, 2]))
-                    PlainToggle(text: "Apple Pencil Settings", isOn: mg_key_binding(["yhHcB0iH0d1XzPO/CFd3ow"]))
+                    PlainToggle(text: "允许安装 iPadOS 应用", isOn: mg_key_binding(["9MZ5AdH43csAUajl/dU+IQ"], type: [Int].self, default_val: [1], on_val: [1, 2]))
+                    PlainToggle(text: "Apple Pencil 设置", isOn: mg_key_binding(["yhHcB0iH0d1XzPO/CFd3ow"]))
                     
                     if UIDevice.current.userInterfaceIdiom == .pad {
-                        PlainToggle(text: "Stage Manager", isOn: mg_key_binding(["qeaj75wk3HF4DwQ8qbIi7g"]))
+                        PlainToggle(text: "台前调度", isOn: mg_key_binding(["qeaj75wk3HF4DwQ8qbIi7g"]))
                     }
                     PlainToggle(
-                        text: "iPadOS UI",
+                        text: "iPadOS 界面",
                         infoType: .warning,
                         infoMessage: "This is a very dangerous tweak to use! If you use an alphanumeric passcode, DO NOT USE THIS TWEAK AT ALL! Please do not turn off \"Show Dock In Stage Manager\" or your device will BOOTLOOP when rotating to landscape! Some users have also reported that enabling the iPadOS UI and then tapping Stage Manager can cause the device to enter Recovery Mode, even when the UI itself appears unchanged. The Settings search bar may move to the top before this happens. With these three things in mind, you may experience general instability, or other major issues such as app data randomly disappearing. But I guess some funny multitasking features that still make the device relatively unusable are cool? Whatever dude, I'm not here to tell you how to use your own device.",
                         isOn: mg_trollpad_binding()
                     )
                     .disabled(cache_extra?["+3Uf0Pm5F8Xy7Onyvko0vA"] as? String != "iPhone")
                 } header: {
-                    Label("iPadOS Features", systemImage: "ipad")
+                    Label("iPadOS 功能", systemImage: "ipad")
                 }
                 
                 Section {
-                    PlainToggle(text: "Internal Storage", isOn: mg_key_binding(["LBJfwOEzExRxzlAnSuI7eg"]))
-                    PlainToggle(text: "Internal Features", isOn: mg_internal_binding())
-                    PlainToggle(text: "Metal HUD in All Apps", isOn: mg_key_binding(["EqrsVvjcYDdxHBiQmGhAWw"]))
+                    PlainToggle(text: "内部存储", isOn: mg_key_binding(["LBJfwOEzExRxzlAnSuI7eg"]))
+                    PlainToggle(text: "内部功能", isOn: mg_internal_binding())
+                    PlainToggle(text: "在所有应用中显示 Metal HUD", isOn: mg_key_binding(["EqrsVvjcYDdxHBiQmGhAWw"]))
                 } header: {
-                    Label("Internal", systemImage: "ant")
+                    Label("内部功能", systemImage: "ant")
                 }
             }
             .navigationTitle("mond")
@@ -297,9 +297,9 @@ struct ContentView: View {
         var errorDescription: String? {
             switch self {
             case .missingArtworkSubtype:
-                return "Failed to get ArtworkDeviceSubType!"
+                return "读取 ArtworkDeviceSubType 失败。"
             case .missingArtworkDeviceName:
-                return "Failed to get ArtworkDeviceProductDescription!"
+                return "读取设备名称失败。"
             }
         }
     }
@@ -346,7 +346,7 @@ struct ContentView: View {
             }
         } catch {
             print("(mg) failed to load data: \(error)")
-            Alertinator.shared.alert(title: "Failed to load current MobileGestalt!", body: "Restart the app and try again. Check logs for more detailed information.")
+            Alertinator.shared.alert(title: "读取 MobileGestalt 失败", body: "请重启应用后重试，并查看日志了解详细信息。")
         }
     }
     
@@ -369,23 +369,31 @@ struct ContentView: View {
 
             // Artwork subtype does not resize the display by itself. Apply the
             // matching optional canvas/status-bar correction as a separate plist
-            // update, mirroring the behavior of Nugget's RDAR fix.
+            // update, mirroring the behavior of Nugget's RDAR fix. A missing
+            // canvas plist must not undo the successful MobileGestalt write.
+            var canvasWarning: String?
             if enable_canvas_fix, let profile = DisplayCanvasProfile.forSubtype(subtype) {
-                try CanvasPlistStore.apply(profile)
-                canvas_size = "\(profile.width) × \(profile.height)"
-                print("(resolution) applied canvas: \(profile.width)x\(profile.height)")
+                do {
+                    try CanvasPlistStore.apply(profile)
+                    canvas_size = "\(profile.width) × \(profile.height)"
+                    print("(resolution) applied canvas: \(profile.width)x\(profile.height)")
+                } catch {
+                    canvasWarning = error.localizedDescription
+                    print("(resolution) canvas fix skipped: \(error)")
+                }
             }
 
             mg_dict_now = NSMutableDictionary()
             enable_devicename = false
 
             print("(mg) successfully overwrote mobilegestalt!")
-            Alertinator.shared.alert(title: "Successfully applied Gestalt tweaks!", body: "Respring your device for changes to take effect. Note that some tweaks may require a reboot for them to apply properly.", actionLabel: "Respring", action: {
+            let canvasMessage = canvasWarning.map { "\n\nCanvas fix was skipped: \($0)" } ?? ""
+            Alertinator.shared.alert(title: "已应用 Gestalt 修改", body: "请重载 SpringBoard 使更改生效；部分修改可能需要重启设备。\(canvasMessage)", actionLabel: "重载 SpringBoard", action: {
                 state.respring()
             })
         } catch {
             print("(mg) failed to apply mobilegestalt: \(error)")
-            Alertinator.shared.alert(title: "Failed to apply tweaks!", body: "No partial resolution change was intentionally committed. Check logs for error information.")
+            Alertinator.shared.alert(title: "应用修改失败", body: "MobileGestalt 修改未完成。请查看日志了解详细错误；如果启用了画布修复，系统可能不支持当前 plist 路径。")
         }
     }
     
@@ -399,11 +407,11 @@ struct ContentView: View {
             enable_canvas_fix = false
 
             print("(mg) successfully reverted mobilegestalt and canvas!")
-            Alertinator.shared.alert(title: "Successfully reverted Gestalt tweaks!", body: "Reboot your device for changes to take effect.")
+            Alertinator.shared.alert(title: "已恢复 Gestalt 修改", body: "请重启设备使更改生效。")
         } catch {
             // The direct file write path now surfaces the underlying error through the catch.
             print("(mg) failed to revert mobilegestalt: \(error)")
-            Alertinator.shared.alert(title: "Failed to revert MobileGestalt!", body: "Check logs for error information.")
+            Alertinator.shared.alert(title: "恢复 MobileGestalt 失败", body: "请查看日志了解详细错误。")
         }
     }
 
@@ -496,7 +504,7 @@ struct ContentView: View {
             },
             set: { enabled in
                 if enabled {
-                    Alertinator.shared.alert(title: "Warning!", body: "Please do not use this feature to bypass region restrictions that would equate to breaking regional laws (e.g. disabling the camera shutter sound). We will NOT be held responsible for enabling any illegal activites!")
+                    Alertinator.shared.alert(title: "警告", body: "请勿使用此功能绕过地区限制或规避当地法律（例如关闭相机快门声）。因启用此功能造成的后果需由用户自行承担。")
                     cache_extra["h63QSdBCiT/z0WU6rdQv6Q"] = "US"
                     cache_extra["zHeENZu+wbg7PUprwNwBWg"] = "LL/A"
                 } else {
