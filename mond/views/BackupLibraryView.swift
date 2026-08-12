@@ -1,12 +1,18 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import PartyUI
+
+private struct SharePayload: Identifiable {
+    let id = UUID()
+    let url: URL
+}
 
 struct BackupLibraryView: View {
     @Binding var dictionary: NSMutableDictionary
     @Binding var isBusy: Bool
     @State private var backups: [MondGestaltBackup] = []
     @State private var showingImporter = false
-    @State private var shareURL: URL?
+    @State private var sharePayload: SharePayload?
     @State private var errorMessage: String?
     @State private var restoreCandidate: MondGestaltBackup?
 
@@ -49,7 +55,7 @@ struct BackupLibraryView: View {
             .fileImporter(isPresented: $showingImporter, allowedContentTypes: [.propertyList, .data], allowsMultipleSelection: false) { result in
                 if case .success(let urls) = result, let url = urls.first { importBackup(url) }
             }
-            .sheet(item: $shareURL) { url in ActivityView(activityItems: [url]) }
+            .sheet(item: $sharePayload) { payload in ActivityView(activityItems: [payload.url]) }
             .confirmationDialog("恢复 MobileGestalt？", isPresented: Binding(get: { restoreCandidate != nil }, set: { if !$0 { restoreCandidate = nil } }), titleVisibility: .visible) {
                 Button("恢复并写入", role: .destructive) { if let backup = restoreCandidate { restore(backup) }; restoreCandidate = nil }
                 Button("取消", role: .cancel) { restoreCandidate = nil }
@@ -62,7 +68,7 @@ struct BackupLibraryView: View {
 
     private func refresh() { backups = (try? MondGestaltBackupStore.list()) ?? [] }
     private func createBackup() {
-        do { let backup = try MondGestaltBackupStore.create(from: Data(contentsOf: URL(fileURLWithPath: TweakPaths.gestalt))); refresh(); Alertinator.shared.alert(title: "备份完成", body: "已创建 \(backup.name)。") }
+        do { _ = try MondGestaltBackupStore.create(from: Data(contentsOf: URL(fileURLWithPath: TweakPaths.gestalt))); refresh() }
         catch { errorMessage = error.localizedDescription }
     }
     private func importBackup(_ url: URL) {
@@ -79,7 +85,7 @@ struct BackupLibraryView: View {
             let destination = FileManager.default.temporaryDirectory.appendingPathComponent(backup.url.lastPathComponent)
             try? FileManager.default.removeItem(at: destination)
             try MondGestaltBackupStore.data(for: backup).write(to: destination, options: .atomic)
-            shareURL = destination
+            sharePayload = SharePayload(url: destination)
         } catch { errorMessage = error.localizedDescription }
     }
     private func restore(_ backup: MondGestaltBackup) {
@@ -87,7 +93,7 @@ struct BackupLibraryView: View {
             _ = try MondGestaltBackupStore.create(from: Data(contentsOf: URL(fileURLWithPath: TweakPaths.gestalt)))
             try writeGestaltData(MondGestaltBackupStore.data(for: backup))
             dictionary = try NSMutableDictionary(contentsOf: URL(fileURLWithPath: TweakPaths.gestalt), error: ())
-            refresh(); Alertinator.shared.alert(title: "恢复完成", body: "MobileGestalt 已恢复。请重启设备使更改生效。")
+            refresh()
         } catch { errorMessage = error.localizedDescription }
     }
     private func delete(_ backup: MondGestaltBackup) { do { try MondGestaltBackupStore.delete(backup); refresh() } catch { errorMessage = error.localizedDescription } }
