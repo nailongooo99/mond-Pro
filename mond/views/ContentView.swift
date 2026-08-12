@@ -47,6 +47,7 @@ struct ContentView: View {
     }
     
     var body: some View {
+        TabView {
         NavigationStack {
             List {
                 if !mg_valid || mg_empty {
@@ -310,6 +311,14 @@ struct ContentView: View {
             .sheet(isPresented: $show_settings) {
                 SettingsView()
             }
+        }
+        .tabItem { Label("工具", systemImage: "switch.2") }
+
+        AdvancedGestaltEditorView(dictionary: $mg_dict_now, isBusy: $is_applying)
+            .tabItem { Label("字段", systemImage: "list.bullet.rectangle") }
+
+        BackupLibraryView(dictionary: $mg_dict_now, isBusy: $is_applying)
+            .tabItem { Label("备份", systemImage: "archivebox") }
         }
     }
     

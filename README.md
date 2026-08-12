@@ -25,6 +25,8 @@ mond Pro 是一个面向 iOS 27.0 beta 1–4 的 MobileGestalt 修改工具，�
 - 为兼容设备提供可选的 `IOMobileGraphicsFamily.plist` 画布修复。
 - 支持画布配置备份与恢复。
 - 内置利用方法选择、沙盒令牌管理、运行日志和 SpringBoard 重载。
+- 参考 GestaltEdit 增加底部三栏导航、高级字段编辑和 MobileGestalt 备份恢复。
+- 高级字段支持字符串、整数、小数、布尔值、Base64 数据、数组和字典，并提供 JSON 校验。
 - 已完成简体中文界面适配。
 
 ### 灵动岛画布修复
@@ -95,6 +97,8 @@ mond Pro is a MobileGestalt customization tool for iOS 27.0 beta 1–4 with an o
 - Optionally update `IOMobileGraphicsFamily.plist` with the canvas size matching the selected Dynamic Island profile.
 - Back up and restore the canvas plist when the system permits access.
 - Includes exploit-method selection, sandbox-token management, runtime logs and SpringBoard respring.
+- Adds a three-tab navigation, advanced field editor, and MobileGestalt backup/restore flow inspired by GestaltEdit.
+- The field editor supports strings, integers, floats, booleans, Base64 data, arrays and dictionaries with JSON validation.
 - Includes Simplified Chinese localization.
 
 ### Dynamic Island canvas fix
@@ -160,6 +164,7 @@ The repository workflow builds an unsigned `.app` on a macOS runner, packages it
 - [johnny](https://github.com/0xjohnnydev) — MCM bug class research / MCM 错误类别相关工作
 - [jailbreak.party](https://github.com/jailbreakdotparty) — PartyUI, GestaltView and respring implementation / PartyUI、GestaltView 及重载 SpringBoard 实现
 - [nailongooo99](https://github.com/nailongooo99) — Simplified Chinese localization support / 提供简体中文汉化支持
+- [frs0n](https://github.com/frs0n) — GestaltEdit developer and feature reference / GestaltEdit 开发者及功能参考
 
 ## License / 许可证
 

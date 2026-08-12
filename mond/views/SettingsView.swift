@@ -151,6 +151,7 @@ struct SettingsView: View {
                     CreditsRow(name: "johnny", role: "MCM 错误类别相关工作", profile: URL(string: "https://github.com/0xjohnnydev")!)
                     CreditsRow(name: "jailbreak.party", role: "PartyUI、GestaltView", profile: URL(string: "https://github.com/jailbreakdotparty")!)
                     CreditsRow(name: "nailongooo99", role: "提供简体中文汉化支持", profile: URL(string: "https://github.com/nailongooo99")!)
+                    CreditsRow(name: "frs0n", role: "GestaltEdit 开发者及功能参考", profile: URL(string: "https://github.com/frs0n")!)
                 } header: {
                     Label("致谢", systemImage: "person.3.fill")
                 }
