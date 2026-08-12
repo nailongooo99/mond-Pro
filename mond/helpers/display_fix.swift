@@ -65,10 +65,12 @@ struct CanvasPlistStore {
         guard let url = existingURL else {
             throw CanvasPlistError.fileNotFound
         }
-        guard let dict = NSMutableDictionary(contentsOf: url, error: ()) else {
+        do {
+            let dict: NSMutableDictionary = try NSMutableDictionary(contentsOf: url, error: ())
+            return (url, dict)
+        } catch {
             throw CanvasPlistError.invalidPlist
         }
-        return (url, dict)
     }
 
     static func write(_ dict: NSMutableDictionary, to url: URL) throws {
