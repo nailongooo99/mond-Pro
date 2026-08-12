@@ -28,6 +28,7 @@ struct ContentView: View {
     @State private var canvas_size: String? = nil
     
     @State private var show_settings: Bool = false
+    @State private var is_applying: Bool = false
     
     private var mg_valid: Bool {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: TweakPaths.gestalt)) else { return false }
@@ -66,16 +67,36 @@ struct ContentView: View {
                 
                 Section {
                     Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            is_applying = true
+                        }
                         mg_apply()
                     } label: {
-                        Text("应用修改")
+                        HStack {
+                            if is_applying {
+                                ProgressView()
+                                    .controlSize(.small)
+                            }
+                            Text(is_applying ? "正在应用…" : "应用修改")
+                        }
                     }
+                    .disabled(is_applying)
                     
                     Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            is_applying = true
+                        }
                         mg_revert()
                     } label: {
-                        Text("恢复修改")
+                        HStack {
+                            if is_applying {
+                                ProgressView()
+                                    .controlSize(.small)
+                            }
+                            Text("恢复修改")
+                        }
                     }
+                    .disabled(is_applying)
                 } footer: {
                     Text("**警告：** 这些修改可能影响设备功能；使用不当还可能导致设备无法正常启动！")
                 }
@@ -237,7 +258,7 @@ struct ContentView: View {
                     PlainToggle(
                         text: "iPadOS 界面",
                         infoType: .warning,
-                        infoMessage: "This is a very dangerous tweak to use! If you use an alphanumeric passcode, DO NOT USE THIS TWEAK AT ALL! Please do not turn off \"Show Dock In Stage Manager\" or your device will BOOTLOOP when rotating to landscape! Some users have also reported that enabling the iPadOS UI and then tapping Stage Manager can cause the device to enter Recovery Mode, even when the UI itself appears unchanged. The Settings search bar may move to the top before this happens. With these three things in mind, you may experience general instability, or other major issues such as app data randomly disappearing. But I guess some funny multitasking features that still make the device relatively unusable are cool? Whatever dude, I'm not here to tell you how to use your own device.",
+                        infoMessage: "这是一个高风险修改。如果你使用字母数字密码，请不要启用。请勿关闭“台前调度中显示程序坞”，否则设备横屏旋转时可能陷入启动循环。部分用户反馈，启用 iPadOS 界面后点击台前调度可能使设备进入恢复模式。启用后还可能出现系统不稳定、应用数据异常消失等问题。",
                         isOn: mg_trollpad_binding()
                     )
                     .disabled(cache_extra?["+3Uf0Pm5F8Xy7Onyvko0vA"] as? String != "iPhone")
@@ -253,7 +274,7 @@ struct ContentView: View {
                     Label("内部功能", systemImage: "ant")
                 }
             }
-            .navigationTitle("mond")
+            .navigationTitle("mond Pro")
             .tint(Color("AccentColor"))
             .onAppear {
                 if !valid {
@@ -273,6 +294,8 @@ struct ContentView: View {
                     canvas_size = "\(profile.width) × \(profile.height)"
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(Color(.systemGroupedBackground))
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
@@ -385,13 +408,19 @@ struct ContentView: View {
 
             mg_dict_now = NSMutableDictionary()
             enable_devicename = false
+            withAnimation(.easeInOut(duration: 0.2)) {
+                is_applying = false
+            }
 
             print("(mg) successfully overwrote mobilegestalt!")
-            let canvasMessage = canvasWarning.map { "\n\nCanvas fix was skipped: \($0)" } ?? ""
+            let canvasMessage = canvasWarning.map { "\n\n画布修复已跳过：\($0)" } ?? ""
             Alertinator.shared.alert(title: "已应用 Gestalt 修改", body: "请重载 SpringBoard 使更改生效；部分修改可能需要重启设备。\(canvasMessage)", actionLabel: "重载 SpringBoard", action: {
                 state.respring()
             })
         } catch {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                is_applying = false
+            }
             print("(mg) failed to apply mobilegestalt: \(error)")
             Alertinator.shared.alert(title: "应用修改失败", body: "MobileGestalt 修改未完成。请查看日志了解详细错误；如果启用了画布修复，系统可能不支持当前 plist 路径。")
         }
@@ -405,10 +434,16 @@ struct ContentView: View {
             try? CanvasPlistStore.revert()
             canvas_size = CanvasPlistStore.currentSize()
             enable_canvas_fix = false
+            withAnimation(.easeInOut(duration: 0.2)) {
+                is_applying = false
+            }
 
             print("(mg) successfully reverted mobilegestalt and canvas!")
             Alertinator.shared.alert(title: "已恢复 Gestalt 修改", body: "请重启设备使更改生效。")
         } catch {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                is_applying = false
+            }
             // The direct file write path now surfaces the underlying error through the catch.
             print("(mg) failed to revert mobilegestalt: \(error)")
             Alertinator.shared.alert(title: "恢复 MobileGestalt 失败", body: "请查看日志了解详细错误。")
@@ -477,7 +512,7 @@ struct ContentView: View {
             return false
         }, set: { enabled in
             if enabled {
-                Alertinator.shared.alert(title: "Warning!", body: "This is a very dangerous tweak to use! If you use an alphanumeric passcode, DO NOT USE THIS TWEAK AT ALL! Please do not turn off \"Show Dock In Stage Manager\" or your device will BOOTLOOP when rotating to landscape! With these two things in mind, you may experience general instability, or other major issues such as app data randomly disappearing. I'm honestly not too certain why you'd want to use this tweak anyways, it's not like your device is gonna be all that usable (due to apps scaling weirdly) when it's enabled.")
+                Alertinator.shared.alert(title: "警告", body: "这是一个高风险修改。如果你使用字母数字密码，请不要启用。请勿关闭“台前调度中显示程序坞”，否则设备横屏旋转时可能陷入启动循环。启用后可能出现系统不稳定或应用数据异常消失等问题。")
             }
             
             cache_data.mutableBytes.storeBytes(of: enabled ? 3 : 1, toByteOffset: value_off, as: Int.self)

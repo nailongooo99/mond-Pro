@@ -54,12 +54,12 @@ struct CanvasPlistStore {
         }
 
         // On builds where the app cannot issue a direct system-file extension,
-        // reuse the already-granted bad_query container extension. This is only
-        // an access grant; the actual plist is still written atomically below.
+        // try the known plist directory through the container query helper.
+        // This is only an access grant; the actual plist is written atomically.
         for plistPath in TweakPaths.canvasPlistCandidates {
-            let directory = URL(fileURLWithPath: plistPath).deletingLastPathComponent().path
-            var pathCString = directory.utf8CString.map { Int8($0) }
-            let handle = bad_query_file(&pathCString, true, nil, false, "com.apple.iokit.IOMobileGraphicsFamily.plist")
+            let fileURL = URL(fileURLWithPath: plistPath)
+            var directoryCString = fileURL.deletingLastPathComponent().path.utf8CString.map { Int8($0) }
+            let handle = bad_query_file(&directoryCString, false, nil, false, fileURL.lastPathComponent)
             if handle >= 0 {
                 accessGranted = true
                 return true
@@ -178,9 +178,9 @@ enum CanvasPlistError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .fileNotFound:
-            return "IOMobileGraphicsFamily.plist was not found or is not accessible."
+            return "找不到 IOMobileGraphicsFamily.plist，或当前系统不允许访问。"
         case .directoryNotFound:
-            return "The managed preferences directory is not available on this iOS build."
+            return "当前 iOS 版本没有可用的受管偏好设置目录。"
         case .invalidPlist:
             return "IOMobileGraphicsFamily.plist is not a valid property list."
         case .backupNotFound:

@@ -25,7 +25,7 @@ struct SettingsView: View {
             List {
                 Section {
                     Button {
-                        if let url = URL(string: "https://github.com/rooootdev/mond"),
+                        if let url = URL(string: "https://github.com/nailongooo99/mond-Pro"),
                            UIApplication.shared.canOpenURL(url) {
                             UIApplication.shared.open(url)
                         }
@@ -38,8 +38,8 @@ struct SettingsView: View {
                                let img = UIImage(named: icon) {
                                 Image(uiImage: img)
                                     .resizable()
-                                    .frame(width: 45, height: 45)
-                                    .cornerRadius(12)
+                                                    .frame(width: 45, height: 45)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                             }
                             
                             VStack(alignment: .leading) {
@@ -150,11 +150,14 @@ struct SettingsView: View {
                     CreditsRow(name: "forcequit", role: "bad_query 利用程序", profile: URL(string: "https://github.com/forcequitOS")!)
                     CreditsRow(name: "johnny", role: "MCM 错误类别相关工作", profile: URL(string: "https://github.com/0xjohnnydev")!)
                     CreditsRow(name: "jailbreak.party", role: "PartyUI、GestaltView", profile: URL(string: "https://github.com/jailbreakdotparty")!)
+                    CreditsRow(name: "nailongooo99", role: "提供简体中文汉化支持", profile: URL(string: "https://github.com/nailongooo99")!)
                 } header: {
                     Label("致谢", systemImage: "person.3.fill")
                 }
             }
             .navigationTitle("设置")
+            .scrollContentBackground(.hidden)
+            .background(Color(.systemGroupedBackground))
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
