@@ -166,7 +166,7 @@ private struct ValueEditorView: View {
 
     private func save() {
         do { onSave(try EditablePlistValueInfo.parse(text, as: kind)); dismiss() }
-        catch { self.error = error.localizedDescription }
+        catch let caughtError { self.error = caughtError.localizedDescription }
     }
 }
 
