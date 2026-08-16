@@ -49,6 +49,18 @@ enum AppPaths {
             ?? URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
         return baseURL.appendingPathComponent("backups", isDirectory: true)
     }
+
+    static var tendies: String {
+        let url = tendiesURL
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+        return url.path
+    }
+
+    private static var tendiesURL: URL {
+        let baseURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+        return baseURL.appendingPathComponent("tendies", isDirectory: true)
+    }
 }
 
 enum TweakPaths {
@@ -64,4 +76,18 @@ enum TweakPaths {
         "/var/mobile/Library/Preferences/com.apple.iokit.IOMobileGraphicsFamily.plist",
         "/private/var/mobile/Library/Preferences/com.apple.iokit.IOMobileGraphicsFamily.plist"
     ]
+}
+
+func list_containers(_ root: String) -> [String] {
+    var normalized = root
+    if normalized.hasPrefix("/private/") { normalized.removeFirst("/private/".count - 1) }
+    if normalized.hasSuffix("/") { normalized.removeLast() }
+    var path = normalized.utf8CString.map { Int8($0) }
+    guard let raw = bad_query_list(&path, 2_000_000) else { return [] }
+    defer { free(raw) }
+    return String(cString: raw).split(whereSeparator: \.isNewline).map(String.init).filter { !$0.isEmpty }
+}
+
+func is_pb_archive(_ url: URL) -> Bool {
+    ["tendies", "zip"].contains(url.pathExtension.lowercased())
 }

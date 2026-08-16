@@ -67,6 +67,21 @@ struct ContentView: View {
                 }
                 
                 Section {
+                    NavigationLink {
+                        PosterView()
+                    } label: {
+                        Label("澶忔櫙涓庡佸姩澹佺焊", systemImage: "photo.on.rectangle")
+                    }
+                    NavigationLink {
+                        SantanderView()
+                    } label: {
+                        Label("鏂囦欢绠＄悊", systemImage: "folder")
+                    }
+                } header: {
+                    Label("鏂板姛鑳�", systemImage: "sparkles")
+                }
+
+                Section {
                     Button {
                         withAnimation(.easeInOut(duration: 0.2)) {
                             is_applying = true

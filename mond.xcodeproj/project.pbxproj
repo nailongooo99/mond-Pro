@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AABBCCDDEEFF001122334403 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = AABBCCDDEEFF001122334402 /* ZIPFoundation */; };
 		CCA208383020090D001C72B6 /* PartyUI in Frameworks */ = {isa = PBXBuildFile; productRef = CCA208373020090D001C72B6 /* PartyUI */; };
 /* End PBXBuildFile section */
 
@@ -27,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AABBCCDDEEFF001122334403 /* ZIPFoundation in Frameworks */,
 				CCA208383020090D001C72B6 /* PartyUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -70,6 +72,7 @@
 			);
 			name = mond;
 			packageProductDependencies = (
+				AABBCCDDEEFF001122334402 /* ZIPFoundation */,
 				CCA208373020090D001C72B6 /* PartyUI */,
 			);
 			productName = mond;
@@ -102,6 +105,7 @@
 			mainGroup = CCF44B36300858B300739BFC;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				AABBCCDDEEFF001122334401 /* XCRemoteSwiftPackageReference \"ZIPFoundation\" */,
 				CCA208363020090D001C72B6 /* XCRemoteSwiftPackageReference "PartyUI" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -355,6 +359,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		AABBCCDDEEFF001122334401 /* XCRemoteSwiftPackageReference \"ZIPFoundation\" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = \"https://github.com/weichsel/ZIPFoundation\";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.0;
+			};
+		};
 		CCA208363020090D001C72B6 /* XCRemoteSwiftPackageReference "PartyUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/jailbreakdotparty/PartyUI";
@@ -366,6 +378,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		AABBCCDDEEFF001122334402 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AABBCCDDEEFF001122334401 /* XCRemoteSwiftPackageReference \"ZIPFoundation\" */;
+			productName = ZIPFoundation;
+		};
 		CCA208373020090D001C72B6 /* PartyUI */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = CCA208363020090D001C72B6 /* XCRemoteSwiftPackageReference "PartyUI" */;

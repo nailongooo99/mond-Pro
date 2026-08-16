@@ -60,8 +60,26 @@ struct RespringView: UIViewRepresentable {
 final class AppState: ObservableObject {
     @Published var show_respring = false
     @Published var exploit_succeeded = false
+    @Published var granting_pb = false
+    @Published var pb_granted: Bool? = nil
+    @Published var granting_apps = false
+    @Published var apps_granted: Bool? = nil
+    @Published var granting_mg = false
+    @Published var mg_granted: Bool? = nil
+    @Published var poster_files: [URL] = []
 
     func respring() {
         show_respring = true
+    }
+
+    func append_poster_file(_ url: URL) {
+        guard is_pb_archive(url), !poster_files.contains(url) else { return }
+        _ = url.startAccessingSecurityScopedResource()
+        poster_files.append(url)
+    }
+
+    func remove_poster_files(at offsets: IndexSet) {
+        for index in offsets { poster_files[index].stopAccessingSecurityScopedResource() }
+        poster_files.remove(atOffsets: offsets)
     }
 }
