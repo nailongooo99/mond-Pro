@@ -79,16 +79,6 @@ enum TweakPaths {
     ]
 }
 
-func list_containers(_ root: String) -> [String] {
-    var normalized = root
-    if normalized.hasPrefix("/private/") { normalized.removeFirst("/private/".count - 1) }
-    if normalized.hasSuffix("/") { normalized.removeLast() }
-    var path = normalized.utf8CString.map { Int8($0) }
-    guard let raw = bad_query_list(&path, 2_000_000) else { return [] }
-    defer { free(raw) }
-    return String(cString: raw).split(whereSeparator: \.isNewline).map(String.init).filter { !$0.isEmpty }
-}
-
 func is_pb_archive(_ url: URL) -> Bool {
     ["tendies", "zip"].contains(url.pathExtension.lowercased())
 }
