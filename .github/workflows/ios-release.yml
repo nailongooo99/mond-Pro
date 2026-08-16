@@ -27,6 +27,7 @@ jobs:
       - name: build
         run: |
           set -euo pipefail
+          set +e
           xcodebuild \
             -project mond.xcodeproj \
             -scheme mond \
@@ -35,7 +36,14 @@ jobs:
             -destination 'generic/platform=iOS' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
-            build
+            build > build.log 2>&1
+          BUILD_STATUS=$?
+          echo '--- Xcode diagnostics ---'
+          grep -E 'error:|warning:|fatal error|BUILD FAILED' build.log || true
+          echo '--- End diagnostics ---'
+          if [ "$BUILD_STATUS" -ne 0 ]; then
+            exit "$BUILD_STATUS"
+          fi
 
           rm -rf Payload mond.ipa
           mkdir -p Payload
