@@ -237,7 +237,7 @@ struct SantanderDirectoryView: View {
         }
 
         var grant_c = path.path.utf8CString.map { Int8($0) }
-        let handle = bad_query(&grant_c, true, nil, false, nil)
+        let handle = bad_query_file(&grant_c, true, nil, false, nil)
         if handle >= 0, let listing = try_direct_listing(for: path) {
             return listing
         }
@@ -515,7 +515,7 @@ struct SantanderFileView: View {
             return true
         }
         var path_c = path.utf8CString.map { Int8($0) }
-        let handle = bad_query(&path_c, true, nil, false, nil)
+        let handle = bad_query_file(&path_c, true, nil, false, nil)
         return handle >= 0 && fm.isReadableFile(atPath: path)
     }
 
@@ -525,7 +525,7 @@ struct SantanderFileView: View {
             return true
         }
         var path_c = path.utf8CString.map { Int8($0) }
-        let handle = bad_query(&path_c, true, nil, false, nil)
+        let handle = bad_query_file(&path_c, true, nil, false, nil)
         return handle >= 0 && fm.isWritableFile(atPath: path)
     }
 

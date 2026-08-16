@@ -66,6 +66,7 @@ enum AppPaths {
 enum TweakPaths {
     static var gestalt = "/private/var/containers/Shared/SystemGroup/systemgroup.com.apple.mobilegestaltcache/Library/Caches/com.apple.MobileGestalt.plist"
     static var gestalt_dir = "/private/var/containers/Shared/SystemGroup/systemgroup.com.apple.mobilegestaltcache/Library/Caches/"
+    static var apps = "/private/var/mobile/Containers/Data/Application/"
 
     // iOS may expose this managed-preferences plist with either path spelling.
     // Prefer the canonical path used by Nugget, while retaining the private path
