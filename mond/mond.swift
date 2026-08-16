@@ -7,6 +7,7 @@
 
 import SwiftUI
 import PartyUI
+import UniformTypeIdentifiers
 
 var pipe = Pipe()
 var sema = DispatchSemaphore(value: 0)
@@ -22,28 +23,49 @@ var path: String {
     }
 
     return url.path
-} 
+}
 
 @main
 struct mond: App {
-    @StateObject private var state = AppState()
+    @StateObject private var state = AppState.shared
+    
+    @AppStorage("ka_on") private var ka_on = true
     
     init() {
-        UserDefaults.standard.register(defaults: ["exploit_method": "bad_query"])
         if !is_debugged() {
             setvbuf(stdout, nil, _IONBF, 0)
             dup2(pipe.fileHandleForWriting.fileDescriptor, STDOUT_FILENO)
         }
+        
+        UserDefaults.standard.register(defaults: ["method": "bad_query"])
+        if UserDefaults.standard.bool(forKey: "ka_on") {
+            keep_alive()
+        }
+        
+        // thanks lunginspector
+        let fix = class_getInstanceMethod(UIDocumentPickerViewController.self, #selector(UIDocumentPickerViewController.fix_init(forOpeningContentTypes:asCopy:)))!
+        let og = class_getInstanceMethod(UIDocumentPickerViewController.self, #selector(UIDocumentPickerViewController.init(forOpeningContentTypes:asCopy:)))!
+        method_exchangeImplementations(og, fix)
     }
     
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(state)
+                .onOpenURL { url in
+                    guard is_pb_archive(url) else {
+                        print("(mond) ignoring unsupported URL: \(url.lastPathComponent)")
+                        return
+                    }
+
+                    state.append_poster_file(url)
+                }
                 .onAppear() {
                     if !is_supported() {
-                        Alertinator.shared.alert(title: "系统版本可能不受支持", body: "当前 iOS 版本可能无法使用 mond。\n目前仅支持 iOS 27.0 beta 1 至 beta 4。")
+                        Alertinator.shared.alert(title: "Not supported!", body: "Your iOS version may not be supported by mond.\nMond only supports iOS 27.0 developer beta 1 - 4.")
                     }
+                    
+                    grant_all(state: state)
                 }
                 .overlay {
                     if state.show_respring {
@@ -56,5 +78,11 @@ struct mond: App {
                     }
                 }
         }
+    }
+}
+
+extension UIDocumentPickerViewController {
+    @objc func fix_init(forOpeningContentTypes contentTypes: [UTType], asCopy: Bool) -> UIDocumentPickerViewController {
+        return fix_init(forOpeningContentTypes: contentTypes, asCopy: true)
     }
 }
