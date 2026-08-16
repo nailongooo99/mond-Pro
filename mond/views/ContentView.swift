@@ -28,6 +28,7 @@ struct ContentView: View {
     @State private var canvas_size: String? = nil
     
     @State private var show_settings: Bool = false
+    @State private var show_new_tools_info: Bool = false
     @State private var is_applying: Bool = false
     
     private var mg_valid: Bool {
@@ -70,15 +71,20 @@ struct ContentView: View {
                     NavigationLink {
                         PosterView()
                     } label: {
-                        Label("澶忔櫙涓庡佸姩澹佺焊", systemImage: "photo.on.rectangle")
+                        Label("墙纸与 PosterBoard", systemImage: "photo.on.rectangle")
                     }
                     NavigationLink {
                         SantanderView()
                     } label: {
-                        Label("鏂囦欢绠＄悊", systemImage: "folder")
+                        Label("文件管理", systemImage: "folder")
+                    }
+                    Button {
+                        show_new_tools_info = true
+                    } label: {
+                        Label("新增工具说明", systemImage: "info.circle")
                     }
                 } header: {
-                    Label("鏂板姛鑳�", systemImage: "sparkles")
+                    Label("新增工具", systemImage: "sparkles")
                 }
 
                 Section {
@@ -325,6 +331,23 @@ struct ContentView: View {
             }
             .sheet(isPresented: $show_settings) {
                 SettingsView()
+            }
+        }
+        .sheet(isPresented: $show_new_tools_info) {
+            NavigationStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 14) {
+                        Text("新增工具说明").font(.title2.bold())
+                        Text("墙纸与 PosterBoard：导入或下载 .tendies 壁纸包，应用后按提示打开并关闭 PosterBoard 使更改生效。")
+                        Text("文件管理：浏览应用容器中的文件，支持文本预览、图片/媒体查看以及在获得授权后保存文件。")
+                        Text("使用建议：一次少量导入壁纸包；如果页面长时间加载，请检查网络和利用方法授权状态，并查看日志。")
+                        Text("这些功能依赖 iOS beta 的沙盒路径和权限行为，具体可用性取决于设备、系统版本和授权结果。")
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                }
+                .navigationTitle("工具说明")
+                .navigationBarTitleDisplayMode(.inline)
             }
         }
         .tabItem { Label("工具", systemImage: "switch.2") }

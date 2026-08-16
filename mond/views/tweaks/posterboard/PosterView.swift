@@ -31,7 +31,7 @@ struct PosterView: View {
                                 ProgressView()
                             }
                             
-                            Text("Apply")
+                            Text("应用")
                         }
                     }
                     .disabled(state.poster_files.isEmpty || busy)
@@ -40,7 +40,7 @@ struct PosterView: View {
                         Button {
                             reset()
                         } label: {
-                            Text("Reset")
+                            Text("恢复")
                         }
                         .disabled(busy)
                     }
@@ -50,18 +50,18 @@ struct PosterView: View {
                     Button {
                         show_importer = true
                     } label: {
-                        Text("Import Tendies")
+                        Text("导入壁纸包")
                     }
                     .disabled(busy)
                     
                     Button {
                         show_explorer = true
                     } label: {
-                        Text("Explore Tendies")
+                        Text("浏览壁纸库")
                     }
                     .disabled(busy)
                 } footer: {
-                    Text("Import up to 5 wallpaper packs.\n**NOTE:** Importing more than 5 tendies at once is not a good idea and importing more than 15 is a TERRIBLE idea. Dont say I didnt warn you.")
+                    Text("最多导入 5 个壁纸包。\n**提示：** 不建议一次导入超过 5 个壁纸包，超过 15 个可能导致系统不稳定。")
                 }
 
                 if !state.poster_files.isEmpty {
@@ -73,11 +73,11 @@ struct PosterView: View {
                             state.remove_poster_files(at: offsets)
                         }
                     } header: {
-                        Label("Imported", systemImage: "document.on.document")
+                        Label("已导入", systemImage: "document.on.document")
                     }
                 }
             }
-            .navigationTitle("PosterBoard")
+            .navigationTitle("墙纸与 PosterBoard")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
@@ -113,8 +113,8 @@ struct PosterView: View {
             print("(pb) applied \(count) descriptor(s).")
             busy = false
             Alertinator.shared.alert(
-                title: "Successfully applied PosterBoard!",
-                body: "For changes to take effect:\n1. Click 'Open' to launch Posterboard\n2. Close it from the App Switcher",
+                title: "PosterBoard 应用成功",
+                body: "要使更改生效：\n1. 点击“打开”启动 PosterBoard\n2. 从 App 切换器中关闭它",
                 actionLabel: "Open",
                 action: {
                     // state.respring()
@@ -128,8 +128,8 @@ struct PosterView: View {
             print("(pb) failed: \(error.localizedDescription)\n")
             busy = false
             Alertinator.shared.alert(
-                title: "Failed to apply PosterBoard!",
-                body: "Restart the app and try again. Check logs for more detailed information."
+                title: "PosterBoard 应用失败",
+                body: "请重启应用后重试，并查看日志了解详细信息。"
             )
         }
     }
@@ -141,8 +141,8 @@ struct PosterView: View {
             print("(pb) reset done.")
             busy = false
             Alertinator.shared.alert(
-                title: "Successfully reverted PosterBoard!",
-                body: "Respring your device for changes to take effect.",
+                title: "PosterBoard 已恢复",
+                body: "请重载 SpringBoard 使更改生效。",
                 actionLabel: "Respring",
                 action: {
                     state.respring()
@@ -152,8 +152,8 @@ struct PosterView: View {
             print("(pb) failed: \(error.localizedDescription)")
             busy = false
             Alertinator.shared.alert(
-                title: "Failed to revert PosterBoard!",
-                body: "Restart the app and try again. Check logs for more detailed information."
+                title: "PosterBoard 恢复失败",
+                body: "请重启应用后重试，并查看日志了解详细信息。"
             )
         }
     }

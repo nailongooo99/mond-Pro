@@ -41,7 +41,10 @@ struct tendies_service {
     private let apple = URL(string: "https://raw.githubusercontent.com/SerStars/Nugget-Wallpapers/main/wallpapers-apple.json")!
 
     private func fetch(from url: URL) async throws -> [tendies] {
-        let (data, response) = try await URLSession.shared.data(from: url)
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 12
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let response = response as? HTTPURLResponse,
               200..<300 ~= response.statusCode else {
@@ -74,7 +77,9 @@ func download_tendies(_ wallpaper: tendies) async throws -> URL {
         throw URLError(.badURL)
     }
 
-    let (data, response) = try await URLSession.shared.data(from: url)
+    var request = URLRequest(url: url)
+    request.timeoutInterval = 20
+    let (data, response) = try await URLSession.shared.data(for: request)
     guard let response = response as? HTTPURLResponse,
           200..<300 ~= response.statusCode else {
         throw URLError(.badServerResponse)
@@ -95,6 +100,7 @@ final class TendiesVM {
     var query = ""
     var loading = false
     var error_msg: String?
+    private let cache_key = "mond.tendies.cache.v1"
 
     var filtered: [tendies] {
         guard !query.isEmpty else {
@@ -116,8 +122,17 @@ final class TendiesVM {
 
         do {
             wallpapers = try await service.fetch_tendies()
+            if let data = try? JSONEncoder().encode(wallpapers) {
+                UserDefaults.standard.set(data, forKey: cache_key)
+            }
         } catch {
             error_msg = error.localizedDescription
+            if wallpapers.isEmpty,
+               let data = UserDefaults.standard.data(forKey: cache_key),
+               let cached = try? JSONDecoder().decode([tendies].self, from: data) {
+                wallpapers = cached
+                error_msg = "网络暂时不可用，当前显示的是上次缓存的壁纸。"
+            }
         }
 
         loading = false

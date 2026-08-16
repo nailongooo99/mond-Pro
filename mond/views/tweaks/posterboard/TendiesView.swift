@@ -19,14 +19,14 @@ struct TendiesView: View {
         NavigationStack {
             Group {
                 if vm.loading && vm.wallpapers.isEmpty {
-                    ProgressView("Loading wallpapers…")
+                    ProgressView("正在加载壁纸…")
                 } else if let error = vm.error_msg, vm.wallpapers.isEmpty {
                     ContentUnavailableView {
-                        Label("Couldn't Load tendies", systemImage: "wifi.exclamationmark")
+                        Label("壁纸库加载失败", systemImage: "wifi.exclamationmark")
                     } description: {
                         Text(error)
                     } actions: {
-                        Button("Try Again") {
+                        Button("重试") {
                             Task {
                                 await vm.retry()
                             }
@@ -36,10 +36,10 @@ struct TendiesView: View {
                     tendies_list
                 }
             }
-            .navigationTitle("Tendies")
+            .navigationTitle("在线壁纸库")
             .searchable(
                 text: $vm.query,
-                prompt: "Search wallpapers"
+                prompt: "搜索壁纸"
             )
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -57,11 +57,11 @@ struct TendiesView: View {
                 await vm.load()
             }
         }
-        .alert("Import Failed", isPresented: Binding(
+        .alert("导入失败", isPresented: Binding(
             get: { import_error != nil },
             set: { if !$0 { import_error = nil } }
         )) {
-            Button("OK", role: .cancel) {}
+            Button("确定", role: .cancel) {}
         } message: {
             Text(import_error ?? "")
         }
@@ -149,7 +149,7 @@ struct TendiesView: View {
                         await add_to_imported(wallpaper)
                     }
                 } label: {
-                    Label("Add to Imported", systemImage: "arrow.down.circle")
+                    Label("加入已导入", systemImage: "arrow.down.circle")
                 }
             }
         }
@@ -241,7 +241,7 @@ struct TendiesDetail: View {
                             .clipShape(RoundedRectangle(cornerRadius: 20))
 
                     case .failure:
-                        ContentUnavailableView("Preview Unavailable", systemImage: "photo", description: Text("The wallpaper preview couldn't be loaded."))
+                        ContentUnavailableView("预览不可用", systemImage: "photo", description: Text("无法加载壁纸预览。"))
 
                     @unknown default:
                         EmptyView()
@@ -291,10 +291,10 @@ struct TendiesDetail: View {
                         if importing {
                             HStack {
                                 ProgressView()
-                                Text("Downloading...")
+                                Text("正在下载…")
                             }
                         } else {
-                            Text("Add to Imported")
+                            Text("加入已导入")
                         }
                     }
                     .disabled(importing)
@@ -302,11 +302,11 @@ struct TendiesDetail: View {
             }
         }
         .navigationTitle(wallpaper.name)
-        .alert("Download Failed", isPresented: Binding(
+        .alert("下载失败", isPresented: Binding(
             get: { import_error != nil },
             set: { if !$0 { import_error = nil } }
         )) {
-            Button("OK", role: .cancel) {}
+            Button("确定", role: .cancel) {}
         } message: {
             Text(import_error ?? "")
         }

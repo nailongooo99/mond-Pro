@@ -140,12 +140,12 @@ struct SantanderDirectoryView: View {
                 NavigationLink {
                     SantanderDirectoryView(path: root_path)
                 } label: {
-                    Label("Go to Root", systemImage: "externaldrive")
+                    Label("前往根目录", systemImage: "externaldrive")
                 }
                 NavigationLink {
                     SantanderDirectoryView(path: home_path)
                 } label: {
-                    Label("Go to Home", systemImage: "house")
+                    Label("前往主目录", systemImage: "house")
                 }
                 Divider()
                 Toggle("Display hidden files", isOn: $display_hidden_files)
@@ -153,12 +153,12 @@ struct SantanderDirectoryView: View {
                 Button {
                     sort_ascending = true
                 } label: {
-                    Label("Sort A-Z", systemImage: "textformat")
+                    Label("按名称升序", systemImage: "textformat")
                 }
                 Button {
                     sort_ascending = false
                 } label: {
-                    Label("Sort Z-A", systemImage: "textformat")
+                    Label("按名称降序", systemImage: "textformat")
                 }
             } label: {
                 Image(systemName: "ellipsis.circle")
@@ -319,10 +319,10 @@ struct SantanderFileView: View {
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     if is_editing {
-                        Button("Cancel") {
+                        Button("取消") {
                             is_editing = false
                         }
-                        Button("Save") {
+                        Button("保存") {
                             save()
                         }
                     } else {
@@ -347,11 +347,11 @@ struct SantanderFileView: View {
                         || Self.plist_editor_content(from: data) != nil
                 }
             }
-            .alert("Save Failed", isPresented: Binding(
+            .alert("保存失败", isPresented: Binding(
                 get: { save_error != nil },
                 set: { if !$0 { save_error = nil } }
             )) {
-                Button("OK", role: .cancel) {}
+                Button("确定", role: .cancel) {}
             } message: {
                 Text(save_error ?? "")
             }
@@ -386,7 +386,7 @@ struct SantanderFileView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .background(Color.black)
             } else {
-                ContentUnavailableView(failure_text("Failed to render image"), systemImage: "photo")
+                    ContentUnavailableView(failure_text("无法渲染图像"), systemImage: "photo")
             }
         }
     }
