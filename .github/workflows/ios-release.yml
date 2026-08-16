@@ -35,7 +35,7 @@ jobs:
             -destination 'generic/platform=iOS' \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
-            build | xcpretty
+            build
 
           rm -rf Payload mond.ipa
           mkdir -p Payload
