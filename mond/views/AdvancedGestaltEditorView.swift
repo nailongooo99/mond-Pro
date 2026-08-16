@@ -196,6 +196,6 @@ private struct AddCacheExtraFieldView: View {
 
     private func add() {
         do { onAdd(key.trimmingCharacters(in: .whitespacesAndNewlines), try EditablePlistValueInfo.parse(text, as: kind)); dismiss() }
-        catch { error = error.localizedDescription }
+        catch let caughtError { error = caughtError.localizedDescription }
     }
 }
